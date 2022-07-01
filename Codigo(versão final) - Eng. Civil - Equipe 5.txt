@@ -1,0 +1,79 @@
+#Bibliotecas instaladas/ atualizadas
+gTTS               2.2.3
+opencv-python      4.5.5.62
+Pillow             9.0.0
+pip                21.3.1
+pypng              0.0.21
+PyQRCode           1.2.1
+pyzbar             0.1.8
+qrcode             7.3.1
+
+
+
+
+# CRIAÇÃO DE QR CODE
+import  qrcode
+from pyzbar.pyzbar import decode
+from PIL import Image
+import qrcode
+from pyzbar.pyzbar import decode
+import cv2
+import time
+
+#texto para audio
+from gtts import gTTS
+import os
+
+
+#Leitura de qr code
+print('Bem vindo!\n\n' 'Você deseja criar um QRcode ou partir para leitura dele?\nLembrando que logo após a criação vamos passar para leitura. ')
+tp= int(input('1 - Criar\n2 - Não criar\n'))
+
+if tp == 1:
+    qr = qrcode.QRCode(version=15, box_size=10, border=5)
+    data = (input('O que você gostaria de dizer?\n'))
+    qr.add_data(data)
+    qr.make(fit=True)
+    img = qr.make_image(fill='black', back_color= 'white')
+    img.save('qrcode.png')
+    print('O nome do arquivo é qrcode.png.')
+elif tp==2:
+    print('Passando para Leitor de QRCode:\n')
+else:
+    print('Opção Invalida!Entenderemos que você deseja fazer a leitura de algum qr code.'),
+print('\nLeitor de QRCode:')
+imagem=0
+leitor= int(input('\nQual a origem do arquivo?\n1 - Arquivo presente neste dispositivo.\n2 - Câmera.\n'))
+if leitor== 1:
+    arquivo_QR = str(input('Qual arquivo deve ser lido?\n'))
+    imagem=cv2.imread(arquivo_QR)
+    for codigo in decode(imagem):
+        print(codigo.type)
+        codigo.data.decode('utf-8')
+        print(codigo.data.decode('utf-8'))
+elif leitor== 2:
+    print('Após a leitura pressione a tecla S repetidas vezes para desligar a câmera.')
+    imagem = cv2.VideoCapture(0)
+    imagem.set(3, 640)
+    imagem.set(4, 480)
+    camera=True
+    while camera == True:
+        success, frame = imagem.read()
+        for codigo in decode(frame):
+            codigo.data.decode('utf-8')
+            print(codigo.data.decode('utf-8'))
+        cv2.imshow('Leitor de QRCode', frame)
+        key = cv2.waitKey(1)
+        time.sleep(5)
+
+        if key == ord('s'):
+            break
+else:
+    print('Opção Invalida!')
+
+#Conversão para audio
+mytext = codigo.data.decode('utf-8')
+language = 'pt'
+meutxt = gTTS(text=mytext, lang=language, slow=False)
+meutxt.save("qrcode.mp3")
+os.system("qrcode.mp3")
